@@ -1,0 +1,9 @@
+.status {
+  border: 1px solid #222222;
+  border-radius: 3px;
+  width: 70px;
+  padding: 4px 10px 4px 10px;
+}
+.statusWrapper {
+  text-align: center;
+}

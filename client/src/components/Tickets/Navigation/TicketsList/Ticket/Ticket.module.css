@@ -1,0 +1,19 @@
+.ticket {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 10px 0 10px;
+  cursor: pointer;
+}
+.avatarBlock {
+  width: 12%;
+}
+.reportBlock {
+  width: 25%;
+}
+.assetBlock {
+  width: 40%;
+}
+.statusBlock {
+  width: 20%;
+}

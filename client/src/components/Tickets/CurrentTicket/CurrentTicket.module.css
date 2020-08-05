@@ -1,0 +1,15 @@
+.ticketBlock {
+  width: 70%;
+  height: 92vh;
+  margin: 0 0 0 10px;
+  background-color: #323232;
+}
+.ticketDetails {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px 0 15px;
+  text-transform: uppercase;
+}
+.ticketDetailsItem {
+  font-size: 12px;
+}
