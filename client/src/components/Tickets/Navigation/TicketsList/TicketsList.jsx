@@ -1,42 +1,15 @@
 import React from "react";
 import Ticket from "./Ticket/Ticket";
 import s from "./TicketsList.module.css";
-import { gql } from "apollo-boost";
-import { graphql } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
-
-const getTicketsQuery = gql`
-  {
-    tickets {
-      ticketId
-      number
-      lastUpdatedTime
-      owner {
-        userId
-        firstName
-        lastName
-        avatar
-        specialities
-      }
-      reportedTime
-      status
-      description
-      asset {
-        assetId
-        name
-        geoCode
-        kmFrom
-        kmTo
-      }
-    }
-  }
-`;
+import { getTicketsQuery } from "../../../graphql/queries/queries";
 
 const TicketsList = (props) => {
-  const tickets = props.data.tickets;
-  return tickets ? (
+  const { data: tickets, loading } = useQuery(getTicketsQuery);
+  return !loading ? (
     <div className={s.ticketsList}>
-      {tickets.map((ticket) => {
+      {tickets.tickets.map((ticket) => {
         return (
           <Link key={ticket.ticketId} to={`/${ticket.ticketId}`}>
             <Ticket
@@ -56,4 +29,4 @@ const TicketsList = (props) => {
   );
 };
 
-export default graphql(getTicketsQuery)(TicketsList);
+export default TicketsList;

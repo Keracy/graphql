@@ -1,8 +1,6 @@
 const graphql = require("graphql");
 const _ = require("lodash");
 const User = require("./models/users");
-const Author = require("./models/authors");
-const Book = require("./models/book");
 const { Ticket } = require("./models/ticket");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -15,22 +13,8 @@ const {
   GraphQLInt,
   GraphQLList,
   GraphQLFloat,
+  GraphQLBoolean,
 } = graphql;
-
-const BookType = new GraphQLObjectType({
-  name: "Book",
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    genre: { type: GraphQLString },
-    author: {
-      type: AuthorType,
-      resolve(parent, args) {
-        return Author.findById(parent.authorId);
-      },
-    },
-  }),
-});
 
 const OwnerType = new GraphQLObjectType({
   name: "Owner",
@@ -55,6 +39,7 @@ const AssetType = new GraphQLObjectType({
 const TicketType = new GraphQLObjectType({
   name: "Ticket",
   fields: () => ({
+    _id: { type: GraphQLID },
     ticketId: { type: GraphQLInt },
     number: { type: GraphQLString },
     lastUpdatedTime: { type: GraphQLString },
@@ -70,19 +55,10 @@ const TicketType = new GraphQLObjectType({
     asset: { type: AssetType },
   }),
 });
-
-const AuthorType = new GraphQLObjectType({
-  name: "Author",
+const DeleteTicketType = new GraphQLObjectType({
+  name: "DeleteTicket",
   fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    age: { type: GraphQLInt },
-    books: {
-      type: new GraphQLList(BookType),
-      resolve(parent, args) {
-        return Book.find({ authorId: parent.id });
-      },
-    },
+    status: { type: GraphQLString },
   }),
 });
 const LoginType = new GraphQLObjectType({
@@ -91,29 +67,23 @@ const LoginType = new GraphQLObjectType({
     jwt: { type: GraphQLString },
   }),
 });
+const LoginCheckType = new GraphQLObjectType({
+  name: "LoginCheck",
+  fields: () => ({
+    logged: { type: GraphQLBoolean },
+  }),
+});
+const RegisterUserType = new GraphQLObjectType({
+  name: "RegisterUser",
+  fields: () => ({
+    username: { type: GraphQLString },
+    phone: { type: GraphQLString },
+    email: { type: GraphQLString },
+  }),
+});
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
-    book: {
-      type: BookType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Author.findById(parent.id);
-      },
-    },
-    author: {
-      type: AuthorType,
-      args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        return Author.find({});
-      },
-    },
-    books: {
-      type: new GraphQLList(BookType),
-      resolve(parent, args) {
-        return Book.find({});
-      },
-    },
     tickets: {
       type: new GraphQLList(TicketType),
       async resolve(parent, args) {
@@ -136,8 +106,23 @@ const RootQuery = new GraphQLObjectType({
       },
       async resolve(parent, args) {
         const user = await User.find({ username: args.username });
+        console.log(user);
+        if (!user[0]) {
+          return { jwt: null };
+        }
         if (await bcrypt.compare(args.password, user[0].password))
-          return { jwt: jwt.sign({ _id: user._id }, "react") };
+          return {
+            jwt: jwt.sign({ _id: user._id }, "react", { expiresIn: "15m" }),
+          };
+        return { jwt: null };
+      },
+    },
+    checkAuth: {
+      type: LoginCheckType,
+      args: { token: { type: GraphQLString } },
+      resolve(parent, args) {
+        console.log(jwt.verify(args.token, "react"));
+        return { logged: !!jwt.verify(args.token, "react") };
       },
     },
   },
@@ -146,34 +131,34 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    addAuthor: {
-      type: AuthorType,
+    registerUser: {
+      type: RegisterUserType,
       args: {
-        name: { type: GraphQLString },
-        age: { type: GraphQLInt },
+        username: { type: GraphQLString },
+        password: { type: GraphQLString },
+        email: { type: GraphQLString },
+        phone: { type: GraphQLString },
       },
-      resolve(parent, args) {
-        const author = new Author({
-          name: args.name,
-          age: args.age,
+      async resolve(parent, args) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(args.password, salt);
+        const newUser = new User({
+          username: args.username,
+          password: hashedPassword,
+          email: args.email,
+          phone: args.phone,
         });
-        return author.save();
+        await newUser.save();
+        return newUser;
       },
     },
-    addBook: {
-      type: BookType,
-      args: {
-        name: { type: GraphQLString },
-        genre: { type: GraphQLString },
-        authorId: { type: GraphQLID },
-      },
-      resolve(parent, args) {
-        const book = new Book({
-          name: args.name,
-          genre: args.genre,
-          authorId: args.authorId,
-        });
-        return book.save();
+    deleteTicket: {
+      type: DeleteTicketType,
+      args: { id: { type: GraphQLString } },
+      async resolve(parent, args) {
+        console.log(args.id);
+        await Ticket.findByIdAndDelete(args.id);
+        return 200;
       },
     },
   },

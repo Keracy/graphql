@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "graphql-tools": "^6.0.15",
     "jsonwebtoken": "^8.5.1",
     "loadash": "^1.0.0",
+    "lodash": "^4.17.19",
     "mongoose": "^5.9.26",
     "nodemon": "^2.0.4"
   }

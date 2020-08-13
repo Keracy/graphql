@@ -1,30 +1,60 @@
 import React from "react";
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import Tickets from "./components/Tickets/Tickets";
-import { Provider } from "react-redux";
-import { store } from "./components/redux/store/store";
-import { BrowserRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { BrowserRouter, Switch } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import { Route } from "react-router-dom";
 import LoginPage from "./components/LoginPage/LoginPage";
-const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
-});
+import { setUserLogged } from "./components/redux/actions/actions";
+import { checkAuthQuery } from "./components/graphql/queries/queries";
+import RegisterPage from "./components/RegisterPage/RegisterPage";
 
-function App() {
+function App(props) {
+  const { data, loading } = useQuery(checkAuthQuery, {
+    variables: {
+      token: localStorage.getItem("auth-token"),
+    },
+  });
+  if (data?.checkAuth.logged) {
+    props.setUserLogged();
+  }
   return (
-    <Provider store={store}>
-      <ApolloProvider client={client}>
-        <BrowserRouter>
-          <div className="App">
-            <PrivateRoute exact path={"/"} auth={false} component={Tickets} />
-            <Route exact path={"/auth"} component={LoginPage} />
-          </div>
-        </BrowserRouter>
-      </ApolloProvider>
-    </Provider>
+    <BrowserRouter>
+      <div className="App">
+        <Switch>
+          {loading ? (
+            <></>
+          ) : (
+            <>
+              <PrivateRoute
+                exact
+                path={"/"}
+                auth={props.userLogged}
+                component={Tickets}
+              />
+              <Route exact path={"/auth"} component={LoginPage} />
+              <Route exact path={"/register"} component={RegisterPage} />
+              <PrivateRoute
+                exact
+                path={"/:ticketId"}
+                auth={props.userLogged}
+                component={Tickets}
+              />
+            </>
+          )}
+        </Switch>
+      </div>
+    </BrowserRouter>
   );
 }
+const mapStateToProps = (state) => {
+  return {
+    userLogged: state.userLogged,
+  };
+};
+const mapDispathToProps = {
+  setUserLogged,
+};
 
-export default App;
+export default connect(mapStateToProps, mapDispathToProps)(App);

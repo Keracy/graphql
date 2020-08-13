@@ -1,1 +1,3 @@
 export const CHOOSE_TICKET = "CHOOSE_TICKET";
+export const SET_USER_LOGGED = "SET_USER_LOGGED";
+export const SET_USER_UNLOGGED = "SET_USER_UNLOGGED";
