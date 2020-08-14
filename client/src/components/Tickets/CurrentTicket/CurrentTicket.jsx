@@ -4,19 +4,27 @@ import Owner from "./Owner/Owner";
 import Details from "./Details/Details";
 import Asset from "./Asset/Asset";
 import { useQuery, useMutation } from "@apollo/client";
-import { getTicketQuery } from "../../graphql/queries/queries";
+import {connect} from 'react-redux';
+import {
+  GET_TICKET_QUERY,
+  GET_TICKETS_QUERY,
+} from "../../graphql/queries/queries";
+import {hideTicket} from '../../redux/actions/actions';
 import { deleteTicketQuery } from "../../graphql/mutations/mutations";
-
 const CurrentTicket = (props) => {
-  const { data, loading } = useQuery(getTicketQuery, {
+  const { data, loading } = useQuery(GET_TICKET_QUERY, {
     variables: {
       id: +props.id,
     },
   });
   const [deleteUser] = useMutation(deleteTicketQuery);
   const currentTicket = data?.ticket;
-  return currentTicket ? (
-    !loading ? (
+
+
+
+
+  return props.ticketChose ? (
+      currentTicket ? (
       <div className={s.ticketBlock}>
         <div className={s.ticketDetails}>
           <p className={s.ticketDetailsItem}>
@@ -42,7 +50,7 @@ const CurrentTicket = (props) => {
           lastName={currentTicket.owner.lastName}
           specialities={currentTicket.owner.specialities}
         />
-        <Details
+        <Details id={currentTicket._id}
           report={`${currentTicket.reportedTime.slice(
             8,
             10
@@ -64,8 +72,12 @@ const CurrentTicket = (props) => {
         <div className={s.buttonWrapper}>
           <button
             className={s.deleteButton}
-            onClick={() => {
-              deleteUser({ variables: { id: currentTicket._id } });
+            onClick={async () => {
+              await deleteUser({
+                variables: { id: currentTicket._id },
+                refetchQueries: [{ query: GET_TICKETS_QUERY }],
+              });
+              props.hideTicket();
             }}
           >
             Delete
@@ -73,11 +85,23 @@ const CurrentTicket = (props) => {
         </div>
       </div>
     ) : (
-      <div className={s.ticketBlock}></div>
+        <div className={s.ticketBlock}>
+            <div className={s.unchosenTicket}><p style={{fontSize: "60px"}}>Loading</p></div>
+        </div>
     )
   ) : (
-    <div className={s.ticketBlock}></div>
+    <div className={s.ticketBlock}>
+      <div className={s.unchosenTicket}><p style={{fontSize: "60px"}}>Choose Ticket</p></div>
+    </div>
   );
 };
 
-export default CurrentTicket;
+const mapStateToProps = (state) => ({
+    ticketChose: state.ticketChose
+})
+
+const mapDispatchToProps = {
+    hideTicket,
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(CurrentTicket);

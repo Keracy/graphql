@@ -6,9 +6,9 @@ const Status = (props) => {
     if (status === "assigned") return <div style={{ color: "gold" }}>ASD</div>;
 
     if (status === "unassigned")
-      return <div style={{ color: "green" }}>COM</div>;
+      return <div style={{ color: "grey" }}>UNA</div>;
 
-    if (status === "completed") return <div style={{ color: "grey" }}>UNA</div>;
+    if (status === "completed") return <div style={{ color: "green" }}>COM</div>;
   };
   const status = checkStatus(props.status);
   return (

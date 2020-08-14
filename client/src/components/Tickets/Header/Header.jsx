@@ -1,12 +1,12 @@
 import React from "react";
 import s from "./Header.module.css";
-import { checkAuthQuery } from "../../graphql/queries/queries";
+import { CHECK_AUTH_QUERY } from "../../graphql/queries/queries";
 import { useQuery } from "@apollo/client";
 import { connect } from "react-redux";
 import { setUserUnlogged } from "../../redux/actions/actions";
 
 const Header = (props) => {
-  const checkAuth = useQuery(checkAuthQuery, {
+  const checkAuth = useQuery(CHECK_AUTH_QUERY, {
     variables: { token: localStorage.getItem("auth-token") },
   });
   return (
@@ -21,9 +21,9 @@ const Header = (props) => {
         <h3>Tickets</h3>
         <h3
           style={{ cursor: "pointer" }}
-          onClick={() => {
+          onClick={async () => {
             localStorage.clear();
-            checkAuth.refetch();
+            await checkAuth.refetch();
             props.setUserUnlogged();
           }}
         >

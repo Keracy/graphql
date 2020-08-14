@@ -7,11 +7,11 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import { Route } from "react-router-dom";
 import LoginPage from "./components/LoginPage/LoginPage";
 import { setUserLogged } from "./components/redux/actions/actions";
-import { checkAuthQuery } from "./components/graphql/queries/queries";
+import { CHECK_AUTH_QUERY } from "./components/graphql/queries/queries";
 import RegisterPage from "./components/RegisterPage/RegisterPage";
 
 function App(props) {
-  const { data, loading } = useQuery(checkAuthQuery, {
+  const { data, loading } = useQuery(CHECK_AUTH_QUERY, {
     variables: {
       token: localStorage.getItem("auth-token"),
     },
@@ -22,28 +22,28 @@ function App(props) {
   return (
     <BrowserRouter>
       <div className="App">
-        <Switch>
           {loading ? (
             <></>
           ) : (
             <>
+            <Switch>
               <PrivateRoute
                 exact
                 path={"/"}
                 auth={props.userLogged}
                 component={Tickets}
               />
-              <Route exact path={"/auth"} component={LoginPage} />
               <Route exact path={"/register"} component={RegisterPage} />
+              <Route exact path={"/auth"} component={LoginPage} />
               <PrivateRoute
                 exact
                 path={"/:ticketId"}
                 auth={props.userLogged}
                 component={Tickets}
               />
+            </Switch>
             </>
           )}
-        </Switch>
       </div>
     </BrowserRouter>
   );
@@ -53,8 +53,8 @@ const mapStateToProps = (state) => {
     userLogged: state.userLogged,
   };
 };
-const mapDispathToProps = {
+const mapDispatchToProps = {
   setUserLogged,
 };
 
-export default connect(mapStateToProps, mapDispathToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

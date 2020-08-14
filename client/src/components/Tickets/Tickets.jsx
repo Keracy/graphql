@@ -10,7 +10,7 @@ const Tickets = (props) => {
       <div className={s.tickets}>
         <Header />
         <div className={s.main}>
-          <Navigation className={s.nav} />
+          <Navigation/>
           <CurrentTicket id={props.match.params.ticketId} />
         </div>
       </div>

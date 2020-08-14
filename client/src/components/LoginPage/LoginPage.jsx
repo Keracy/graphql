@@ -3,19 +3,19 @@ import s from "./LoginPage.module.css";
 import { useLazyQuery } from "@apollo/client";
 import { Redirect, Link } from "react-router-dom";
 import { connect } from "react-redux";
-import { loginUserQuery, checkAuthQuery } from "../graphql/queries/queries";
+import { LOGIN_USER_QUERY, CHECK_AUTH_QUERY } from "../graphql/queries/queries";
 import { setUserLogged } from "../redux/actions/actions";
 
 const LoginPage = (props) => {
   const [auth, setAuth] = useState({ username: "", password: "" });
-  const [login, { data, loading }] = useLazyQuery(loginUserQuery, {
+  const [login, { data, loading }] = useLazyQuery(LOGIN_USER_QUERY, {
     variables: {
       username: auth.username,
       password: auth.password,
     },
   });
 
-  const [checkAuth, { data: authData }] = useLazyQuery(checkAuthQuery, {
+  const [checkAuth, { data: authData }] = useLazyQuery(CHECK_AUTH_QUERY, {
     variables: { token: localStorage.getItem("auth-token") },
   });
 

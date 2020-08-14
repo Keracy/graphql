@@ -3,15 +3,17 @@ import Ticket from "./Ticket/Ticket";
 import s from "./TicketsList.module.css";
 import { useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { getTicketsQuery } from "../../../graphql/queries/queries";
+import { connect } from 'react-redux';
+import { chooseTicket } from '../../../redux/actions/actions';
+import { GET_TICKETS_QUERY } from "../../../graphql/queries/queries";
 
 const TicketsList = (props) => {
-  const { data: tickets, loading } = useQuery(getTicketsQuery);
+  const { data: tickets, loading } = useQuery(GET_TICKETS_QUERY);
   return !loading ? (
     <div className={s.ticketsList}>
       {tickets.tickets.map((ticket) => {
         return (
-          <Link key={ticket.ticketId} to={`/${ticket.ticketId}`}>
+          <Link onClick={props.chooseTicket} key={ticket.ticketId} to={`/${ticket.ticketId}`}>
             <Ticket
               ticket={ticket}
               key={ticket.ticketId}
@@ -28,5 +30,8 @@ const TicketsList = (props) => {
     <></>
   );
 };
+const mapDispatchToProps = {
+  chooseTicket
+}
 
-export default TicketsList;
+export default connect(null, mapDispatchToProps)(TicketsList);

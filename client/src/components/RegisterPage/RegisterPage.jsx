@@ -16,7 +16,7 @@ const RegisterPage = (props) => {
   const [register] = useMutation(registerUserMutation);
   const submitHandler = async (event) => {
     event.preventDefault();
-    register({
+    await register({
       variables: {
         username: user.username,
         password: user.password,
@@ -33,7 +33,7 @@ const RegisterPage = (props) => {
     }));
   };
   return props.userLogged ? (
-    <Redirect to="/register" />
+    <Redirect to="/1" />
   ) : (
     <div className={s.loginWrapper}>
       <div className={s.loginBlock}>

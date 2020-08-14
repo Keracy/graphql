@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 
-export const checkAuthQuery = gql`
+export const CHECK_AUTH_QUERY = gql`
   query($token: String) {
     checkAuth(token: $token) {
       logged
     }
   }
 `;
-export const getTicketQuery = gql`
+export const GET_TICKET_QUERY = gql`
   query($id: Int) {
     ticket(id: $id) {
       _id
@@ -34,14 +34,14 @@ export const getTicketQuery = gql`
     }
   }
 `;
-export const loginUserQuery = gql`
+export const LOGIN_USER_QUERY = gql`
   query($username: String, $password: String) {
     login(username: $username, password: $password) {
       jwt
     }
   }
 `;
-export const getTicketsQuery = gql`
+export const GET_TICKETS_QUERY = gql`
   {
     tickets {
       ticketId

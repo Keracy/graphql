@@ -26,3 +26,9 @@
   justify-content: center;
   margin-top: 55px;
 }
+.unchosenTicket{
+  display: flex;
+  justify-content: center;
+  height: 94%;
+  align-items: center;
+}

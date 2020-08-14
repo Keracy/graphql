@@ -23,7 +23,7 @@ const OwnerType = new GraphQLObjectType({
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
     avatar: { type: GraphQLString },
-    specialities: { type: new GraphQLList(GraphQLString) },
+    specialities: { type: GraphQLList(GraphQLString) },
   }),
 });
 const AssetType = new GraphQLObjectType({
@@ -81,11 +81,17 @@ const RegisterUserType = new GraphQLObjectType({
     email: { type: GraphQLString },
   }),
 });
+const MutationStatusType = new GraphQLObjectType({
+  name: "MutationStatus",
+  fields: () => ({
+    status: {type: GraphQLString},
+  }),
+})
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     tickets: {
-      type: new GraphQLList(TicketType),
+      type: GraphQLList(TicketType),
       async resolve(parent, args) {
         return await Ticket.find({});
       },
@@ -141,9 +147,12 @@ const Mutation = new GraphQLObjectType({
       },
       async resolve(parent, args) {
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(args.password, salt);
+        const hashedPassword = await bcrypt.hash(
+          args.password.toLowerCase(),
+          salt
+        );
         const newUser = new User({
-          username: args.username,
+          username: args.username.toLowerCase(),
           password: hashedPassword,
           email: args.email,
           phone: args.phone,
@@ -161,6 +170,19 @@ const Mutation = new GraphQLObjectType({
         return 200;
       },
     },
+    editStatus: {
+      type: MutationStatusType,
+      args: { id: {type: GraphQLString }, status: { type: GraphQLString } },
+      async resolve(parent, args){
+        let status;
+        if(args.status === "ASD") status = "assigned";
+        if(args.status === "COM") status = "completed";
+        if(args.status === "UNA") status = "unassigned";
+        console.log(status);
+        await Ticket.findByIdAndUpdate(args.id, {status: status} );
+        return {status: "Done"};
+      },
+    }
   },
 });
 

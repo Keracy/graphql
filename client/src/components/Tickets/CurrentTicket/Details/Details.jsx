@@ -1,6 +1,7 @@
 import React from "react";
 import s from "./Details.module.css";
 import Status from "../../Navigation/TicketsList/Ticket/Status/Status";
+import CustomSelect from "../CustomSelect/CustomSelect";
 
 const Details = (props) => {
   return (
@@ -16,7 +17,8 @@ const Details = (props) => {
           </div>
           <div className={s.field}>
             <p className={s.fieldTitle}>Status</p>
-            <Status status={props.status} />
+            <CustomSelect status={props.status} id={props.id}/>
+
           </div>
           <div className={s.field}>
             <p className={s.fieldTitle}>Description</p>
