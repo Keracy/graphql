@@ -1,6 +1,5 @@
 import React, {useEffect, useRef} from 'react';
 import useDropDown from './useDropDown';
-import SomeComponent from "./SomeComponent";
 import {useMutation} from "@apollo/client";
 import {EDIT_STATUS_MUTATION} from "../../../graphql/mutations/mutations";
 
